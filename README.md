@@ -34,7 +34,7 @@ The python data pipeline defined for BrodyLab.
 9. If you have install issues, especially on a windows machine, see [here](https://github.com/Brody-Lab/bl_pipeline_python/blob/main/install_debug.md)
 10. Additional libraries you may want to install:
     ```
-    pip install seaborn pyarrow
+    pip install seaborn pyarrow openpyxl
     ```
 
 ## Tutorials
