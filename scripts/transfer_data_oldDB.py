@@ -79,6 +79,7 @@ dict_dates_big_tables = {
     'water': 'date',
     'schedule': 'date',
     'sessions': 'sessiondate',
+    'session_agg_date': 'sessiondate',
     'calibration_info_tbl': 'dateval'
 }
 time2_str_dict = {
@@ -87,6 +88,7 @@ time2_str_dict = {
     'mass': ['timeval'],
     'water': ['starttime', 'stoptime'],
     'sessions': ['starttime', 'endtime'],
+    'session_agg_date': ['starttime', 'endtime'],
     'turn_down_log': ['turn_time'],
     'sess_started': ['starttime']
 }
