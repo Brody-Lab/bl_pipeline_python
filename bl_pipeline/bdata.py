@@ -57,7 +57,7 @@ class BehaviorEvent(dj.Imported):
 
      @property
      def key_source(self):
-          return super().key_source & (bdata.Sessions & 'sessid > 890000')
+          return super().key_source & (bdata.Sessions & 'sessid > 904000')
 
      def make(self,key):
 
@@ -70,7 +70,7 @@ class BehaviorEvent(dj.Imported):
 
           dict_event = df_event.to_dict('records')
 
-          self.insert(dict_event)
+          self.insert(dict_event, skip_duplicates=True)
 
 
 
