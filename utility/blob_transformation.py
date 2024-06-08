@@ -46,7 +46,6 @@ def blob_dict_to_df(blob_dict):
         #If not the same sizes, we cannot convert return empty DF
         print('Not all variables are the same length. Cannot create proper DataFrame')
         result = '\n'.join(f'{key}: {value}' for key, value in sizes_dict.items())
-        print(result)
         return pd.DataFrame()
 
 def blob_peh_to_df(blob_peh, append_original_columnname=False):
@@ -77,7 +76,6 @@ def _blob_to_dict(array_test, parent_fields=None):
     "Private function"
     Recursive transformation of numpy array (saved with matlab datjoint) to dictionary.
     '''
-    print('array_test', array_test)
 
     # Set array as writable for further use
     if isinstance(array_test, np.ndarray):
