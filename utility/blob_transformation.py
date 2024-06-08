@@ -77,6 +77,7 @@ def _blob_to_dict(array_test, parent_fields=None):
     "Private function"
     Recursive transformation of numpy array (saved with matlab datjoint) to dictionary.
     '''
+    print('array_test', array_test)
 
     # Set array as writable for further use
     if isinstance(array_test, np.ndarray):
@@ -264,6 +265,9 @@ def peh_trial_df_to_event_df(peh_trial_df, sessid):
 
                 # Concat in a single df for all events
                 df_event = pd.concat([df_event, this_row_event_df])
+
+    #Remove events with Numpy Array on time (stating_state or ending_state normally) 
+    df_event = df_event.loc[~df_event['in_time'].apply(lambda x: isinstance(x, np.ndarray)), :]
 
     # Get id_event of the session
     df_event = df_event.reset_index(drop=True)
