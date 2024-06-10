@@ -65,9 +65,9 @@ date_ref = date_ref - datetime. timedelta(num_days_before)
 date_ref = date_ref.strftime("%Y-%m-%d")
 
 # Special parameters, date columns and big tables with no date field
-nodate_tables = ['sess_list', 'parsed_events', 'sessions', 'channels']
+nodate_tables = ['sess_list', 'parsed_events', 'sessions', 'channels', '_behavior_event']
 
-noneed_copy = ['schedule', 'carlosexperiment', 'infusions', 'events', 'raw_tracking', 'tracking', 'gcs_old', 'sched_rescue', 'gcs', 'video_log', 'spktimes', 'rigtrials', '_behavior_event', '~log']
+noneed_copy = ['schedule', 'carlosexperiment', 'infusions', 'events', 'raw_tracking', 'tracking', 'gcs_old', 'sched_rescue', 'gcs', 'video_log', 'spktimes', 'rigtrials', '~log']
 
 dict_dates_big_tables = {
     'technotes': 'datestr',
@@ -222,8 +222,6 @@ for i in range(tables_nodate_copy.shape[0]):
 
      sql = "SELECT * from " + tables_nodate_copy.loc[i, 'TABLE_SCHEMA'] + "." + tables_nodate_copy.loc[i, 'TABLE_NAME'] +  " "
 
-     print(sql)
-
      #Get datajoint table handle
      schema_class= getattr(sys.modules[__name__], tables_nodate_copy.loc[i, 'TABLE_SCHEMA']+"test")
      table_class = getattr(schema_class, dj.utils.to_camel_case(tables_nodate_copy.loc[i, 'TABLE_NAME']))
@@ -232,7 +230,8 @@ for i in range(tables_nodate_copy.shape[0]):
      #Insert on groups of 1000 sessions (if not data to big)
      sess_array = np.arange(min_session,max_session+1000,1000)
      for j in range(sess_array.shape[0]-1):
-        sql2 = sql +' WHERE sessid >= ' + str(sess_array[j]) + " AND sessid < " + str(sess_array[j+1])
+        sql2 = sql +' WHERE sessid >= ' + str(sess_array[j]) + " AND sessid < " + str(sess_array[j+1])q
+        print(sql2)
     
         con = dj.conn(host=db_params['host'],user=db_params['user'],password=db_params['password'], reset=True)
         dj.blob.bypass_serialization = True
