@@ -250,6 +250,6 @@ for i in range(tables_nodate_copy.shape[0]):
     
             print(data_insert)
             dj.blob.bypass_serialization = True
-            table_instance.insert(data_insert, skip_duplicates=True)
+            table_instance.insert(data_insert, skip_duplicates=True, allow_direct_insert=True)
             conn1.close()
     
