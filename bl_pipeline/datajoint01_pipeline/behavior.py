@@ -2,9 +2,6 @@ import datajoint as dj
 from bl_pipeline.datajoint01_pipeline  import acquisition
 
 
-
-# acquisition  = dj.create_virtual_module('acquisition', 'bl_new_acquisition')
-
 # create new schema
 schema = dj.schema('bl_new_behavior')
 
