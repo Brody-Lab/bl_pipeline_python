@@ -1,4 +1,5 @@
 import datajoint as dj
+import utility.blob_transformation as bt
 
 
 bdata   = dj.create_virtual_module('bdata', 'bdatatest')
@@ -134,3 +135,18 @@ class AcquisitionSessions(dj.Manual):
      acquisition_post_abs_path=null:    VARCHAR(200)    # absoulte path of post processing file (clustered/segmented)
      acquisition_post_rel_path=null:    VARCHAR(200)    # relative path (from ephys or imaging  clustering/segmentation root dir)
      """
+
+@schema
+class ParsedEvents(dj.Computed):
+     definition = """
+     ->Sessions
+     -----
+     peh:                               mediumblob      # ratname inherited from rats table
+     """
+     def make(self,key):
+          dj.blob.use_32bit_dims = True
+          parsed_events = (bdata.ParsedEvents & key).fetch(as_dict=True)
+          peh = bt.transform_blob(parsed_events[0]['peh'])
+          df_trial_peh = bt.blob_peh_to_df(peh, append_original_columnname=True)
+          key['peh'] = df_trial_peh.to_dict('records')
+          self.insert1(key)

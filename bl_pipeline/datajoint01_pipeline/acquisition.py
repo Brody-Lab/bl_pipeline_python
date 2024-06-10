@@ -222,3 +222,11 @@ class AcquisitionSessionsStatus(dj.Manual):
      error_exception=null:              BLOB            # Error exception if status is failed
      """
 
+@schema
+class ParsedEvents(dj.Manual):
+     definition = """
+     ->Sessions
+     -----
+     peh:                               mediumblob      # ratname inherited from rats table
+     """
+

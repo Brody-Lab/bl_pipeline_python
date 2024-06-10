@@ -1,13 +1,15 @@
 import traceback
 import datetime
+import numpy as np
 import datajoint as dj
 
 from bl_pipeline.datajoint01_pipeline.shadow import lab as lab_shadow
 from bl_pipeline.datajoint01_pipeline.shadow import subject as subject_shadow
 from bl_pipeline.datajoint01_pipeline.shadow import action as action_shadow
 from bl_pipeline.datajoint01_pipeline.shadow import acquisition as acquisition_shadow
+from bl_pipeline.datajoint01_pipeline.shadow import behavior as behavior_shadow
 
-from bl_pipeline.datajoint01_pipeline import lab, subject, action, acquisition
+from bl_pipeline.datajoint01_pipeline import lab, subject, action, acquisition, behavior
 
 import sys
 
@@ -125,9 +127,25 @@ MODULES = [
             module=(acquisition, acquisition_shadow),
             tables=[
                 'SessStarted',
-                'Sessions'
+                'Sessions',
             ]
         )
+]
+
+MODULES_NO_DATE = [
+    dict(
+            module=(acquisition, acquisition_shadow),
+            tables=[
+                'ParsedEvents'
+            ]
+        ),
+
+    #dict(
+    #        module=(behavior, behavior_shadow),
+    #        tables=[
+    #            'BehaviorEvent'
+    #        ]
+    #    )
 ]
 
 # Copy data from source tables to shadow tables
@@ -140,12 +158,14 @@ def ingest_shadow():
             print(f'Populating shadow table {table_name}')
             if table_name in list(dict_tables_primary_id.keys()):
                 query_date =  [dict_tables_primary_id[table_name][0] + ">='" + date_ref + "'"]
+                print('query_date', query_date)
                 id_date = (table_shadow & query_date).fetch(dict_tables_primary_id[table_name][1], limit=1)
-                print(id_date)
+                print('id_date', id_date)
                 print(query_date)
                 if len(id_date) > 0:
                     id_date = id_date[0]
                     query =  [dict_tables_primary_id[table_name][1] + ">=" + str(id_date)]
+                    print('query', query)
                     table_shadow.populate(query, **kwargs)
             else:
                 table_shadow.populate(**kwargs)
@@ -158,10 +178,49 @@ def ingest_real():
             print(f'Copying to real table {table_name}')
             copy_table(m['module'][0], m['module'][1], table_name)
 
+def get_sessid_date():
+
+    query_date = "session_date >='"  + date_ref +"'"
+    min_sessid = (acquisition_shadow.SessStarted & (query_date)).fetch("sessid", order_by="sessid", limit=1)
+    max_sessid = (acquisition_shadow.SessStarted & (query_date)).fetch("sessid", order_by="sessid DESC", limit=1)
+
+    return min_sessid, max_sessid
+
+# Copy data from source tables to shadow tables
+def ingest_shadow_no_date(min_sessid, max_sessid):
+
+    kwargs = dict(display_progress=True, suppress_errors=False)
+    for m in MODULES_NO_DATE:
+        for table_name in m['tables']:
+            table_shadow = getattr(m['module'][1], table_name)
+            print(f'Populating shadow table no_date {table_name}')
+           
+            sess_array = np.arange(min_sessid,max_sessid+50,50)
+
+            for j in range(sess_array.shape[0]-1):
+                sql2 = 'sessid >= ' + str(sess_array[j]) + " AND sessid < " + str(sess_array[j+1])
+                print(sql2)
+                table_shadow.populate(sql2, **kwargs)
+
+# Copy data from shadow table to new table
+def ingest_real_no_date():
+
+    for m in MODULES_NO_DATE:
+        for table_name in m['tables']:
+            print(f'Copying to real table no date {table_name}')
+            copy_table(m['module'][0], m['module'][1], table_name)
 
 def main():
+
+
+
     ingest_shadow()
     ingest_real()
+
+    min_sessid, max_sessid = get_sessid_date()
+    ingest_shadow_no_date(min_sessid, max_sessid)
+    #ingest_real_no_date()
+
 
     # Copy data from shadow table to new table
     # subject.Rats.Contact.insert(subject_shadow.Rats.Contact)
