@@ -228,11 +228,11 @@ for i in range(tables_nodate_copy.shape[0]):
      table_instance = table_class()
 
      #Insert on groups of 1000 sessions (if not data to big)
-     sess_array = np.arange(min_session,max_session+1000,1000)
+     sess_array = np.arange(min_session,max_session+50,50)
      for j in range(sess_array.shape[0]-1):
         sql2 = sql +' WHERE sessid >= ' + str(sess_array[j]) + " AND sessid < " + str(sess_array[j+1])
         print(sql2)
-        
+
         con = dj.conn(host=db_params['host'],user=db_params['user'],password=db_params['password'], reset=True)
         dj.blob.bypass_serialization = True
         data_insert = pd.DataFrame(con.query(sql2, as_dict=True))
