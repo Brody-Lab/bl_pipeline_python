@@ -128,6 +128,7 @@ MODULES = [
             tables=[
                 'SessStarted',
                 'Sessions',
+                'SessionProtocolData'
             ]
         )
 ]

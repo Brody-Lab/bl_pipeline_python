@@ -139,9 +139,9 @@ class AcquisitionSessions(dj.Manual):
 @schema
 class ParsedEvents(dj.Computed):
      definition = """
-     ->Sessions
+     ->bdata.Sessions
      -----
-     peh:                               mediumblob      # ratname inherited from rats table
+     peh:                               mediumblob      # peh data from ParsedEvents transformed by trial events
      """
      def make(self,key):
           dj.blob.use_32bit_dims = True
@@ -149,4 +149,19 @@ class ParsedEvents(dj.Computed):
           peh = bt.transform_blob(parsed_events[0]['peh'])
           df_trial_peh = bt.blob_peh_to_df(peh, append_original_columnname=True)
           key['peh'] = df_trial_peh.to_dict('records')
+          self.insert1(key)
+
+@schema
+class SessionProtocolData(dj.Computed):
+     definition = """
+     ->bdata.Sessions
+     -----
+     protocol_data:                     mediumblob      # protocol_data from Sessions transformed per trial events
+     """
+     def make(self,key):
+          dj.blob.use_32bit_dims = True
+          protocol_data = (bdata.Sessions & key).fetch('protocol_data', as_dict=True)
+          protocol_data = bt.transform_blob(protocol_data[0]['protocol_data'])
+          df_trial_protocol_data = bt.blob_peh_to_df(protocol_data, append_original_columnname=True)
+          key['protocol_data'] = df_trial_protocol_data.to_dict('records')
           self.insert1(key)
