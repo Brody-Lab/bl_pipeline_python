@@ -90,7 +90,7 @@ def copy_table_no_date(target_schema, src_schema, table_name, id_ref1, id_ref2, 
     src_table = getattr(src_schema, table_name)
 
     if table_name in list(dict_dates_big_tables_no_date.keys()):
-        query =  dict_dates_big_tables[table_name] + ">='" + id_ref1 + "' and " + dict_dates_big_tables[table_name] + "<" + id_ref2 + "'"
+        query =  dict_dates_big_tables_no_date[table_name] + ">='" + id_ref1 + "' and " + dict_dates_big_tables_no_date[table_name] + "<" + id_ref2 + "'"
         print(query) 
         src_table = src_table & query
         target_table = target_table & query
