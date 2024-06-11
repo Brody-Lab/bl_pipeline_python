@@ -38,6 +38,12 @@ dict_dates_big_tables = {
     'RatHistory': 'logtime',   
 }
 
+dict_dates_big_tables_no_date = {
+    'BehaviorEvent':  'sessid',
+    'SessionProtocolData': 'sessid',
+    'ParsedEvents': 'sessid',
+}
+
 dict_tables_primary_id = {
     'Technotes': ['technote_datetime', 'technote_id'],
     'TechSchedule': ['techschedule_date','scheduleid'],
@@ -63,6 +69,29 @@ def copy_table(target_schema, src_schema, table_name, **kwargs):
 
     if table_name in list(dict_dates_big_tables.keys()):
         query =  dict_dates_big_tables[table_name] + ">='" + date_ref + "'"
+        src_table = src_table & query
+        target_table = target_table & query
+    
+    q_insert = src_table - target_table.proj()
+    
+    try:
+        target_table.insert(q_insert, **kwargs)
+    except Exception:
+        for t in (q_insert).fetch(as_dict=True):
+            try:
+                target_table.insert1(t, **kwargs)
+            except Exception:
+                print("Error when inserting {}".format(t))
+                traceback.print_exc()
+
+# Copy data from shadow table (src_schema) to new table (target_schema) with no date reference
+def copy_table_no_date(target_schema, src_schema, table_name, id_ref1, id_ref2, **kwargs):
+    target_table = getattr(target_schema, table_name)
+    src_table = getattr(src_schema, table_name)
+
+    if table_name in list(dict_dates_big_tables_no_date.keys()):
+        query =  dict_dates_big_tables[table_name] + ">='" + id_ref1 + "' and " + dict_dates_big_tables[table_name] + "<" + id_ref2 + "'"
+        print(query) 
         src_table = src_table & query
         target_table = target_table & query
     
@@ -204,12 +233,15 @@ def ingest_shadow_no_date(min_sessid, max_sessid):
                 table_shadow.populate(sql2, **kwargs)
 
 # Copy data from shadow table to new table
-def ingest_real_no_date():
+def ingest_real_no_date(min_sessid, max_sessid):
 
     for m in MODULES_NO_DATE:
         for table_name in m['tables']:
             print(f'Copying to real table no date {table_name}')
-            copy_table(m['module'][0], m['module'][1], table_name)
+
+            sess_array = np.arange(min_sessid,max_sessid+1000,1000)
+            for j in range(sess_array.shape[0]-1):
+                copy_table_no_date(m['module'][0], m['module'][1], table_name, sess_array[j], sess_array[j+1])
 
 def main():
 
@@ -219,8 +251,8 @@ def main():
     #ingest_real()
 
     min_sessid, max_sessid = get_sessid_date()
-    ingest_shadow_no_date(min_sessid, max_sessid)
-    #ingest_real_no_date()
+    #ingest_shadow_no_date(min_sessid, max_sessid)
+    ingest_real_no_date(min_sessid, max_sessid)
 
 
     # Copy data from shadow table to new table
