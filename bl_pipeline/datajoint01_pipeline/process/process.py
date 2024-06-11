@@ -251,7 +251,7 @@ def main():
     #ingest_real()
 
     min_sessid, max_sessid = get_sessid_date()
-    #ingest_shadow_no_date(min_sessid, max_sessid)
+    ingest_shadow_no_date(min_sessid, max_sessid)
     ingest_real_no_date(min_sessid, max_sessid)
 
 
