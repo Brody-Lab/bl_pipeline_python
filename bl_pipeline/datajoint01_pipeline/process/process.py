@@ -127,8 +127,7 @@ MODULES = [
             module=(acquisition, acquisition_shadow),
             tables=[
                 'SessStarted',
-                'Sessions',
-                'SessionProtocolData'
+                'Sessions'
             ]
         )
 ]
@@ -137,6 +136,7 @@ MODULES_NO_DATE = [
     dict(
             module=(acquisition, acquisition_shadow),
             tables=[
+                'SessionProtocolData',
                 'ParsedEvents'
             ]
         ),
@@ -196,7 +196,7 @@ def ingest_shadow_no_date(min_sessid, max_sessid):
             table_shadow = getattr(m['module'][1], table_name)
             print(f'Populating shadow table no_date {table_name}')
            
-            sess_array = np.arange(min_sessid,max_sessid+50,50)
+            sess_array = np.arange(min_sessid,max_sessid+1000,1000)
 
             for j in range(sess_array.shape[0]-1):
                 sql2 = 'sessid >= ' + str(sess_array[j]) + " AND sessid < " + str(sess_array[j+1])
@@ -215,8 +215,8 @@ def main():
 
 
 
-    ingest_shadow()
-    ingest_real()
+    #ingest_shadow()
+    #ingest_real()
 
     min_sessid, max_sessid = get_sessid_date()
     ingest_shadow_no_date(min_sessid, max_sessid)
