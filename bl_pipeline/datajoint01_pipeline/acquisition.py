@@ -230,3 +230,10 @@ class ParsedEvents(dj.Manual):
      peh:                               mediumblob      # ratname inherited from rats table
      """
 
+@schema
+class SessionProtocolData(dj.Manual):
+     definition = """
+     ->Sessions
+     -----
+     protocol_data:                     mediumblob      # protocol_data from Sessions transformed per trial events
+     """
