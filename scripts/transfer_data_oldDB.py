@@ -229,7 +229,7 @@ for i in range(tables_nodate_copy.shape[0]):
      print()
 
      #Insert on groups of 1000 sessions (if not data to big)
-     sess_array = np.arange(min_session,max_session+50,50)
+     sess_array = np.arange(min_session,max_session+500,500)
      for j in range(sess_array.shape[0]-1):
         sql_inner = 'sessid >= ' + str(sess_array[j]) + " AND sessid < " + str(sess_array[j+1]) 
         sql2 = sql + ' WHERE ' + sql_inner + " ORDER by sessid"

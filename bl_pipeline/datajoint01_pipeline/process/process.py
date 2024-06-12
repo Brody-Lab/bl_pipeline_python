@@ -214,7 +214,7 @@ def get_sessid_date():
     min_sessid = (acquisition_shadow.SessStarted & (query_date)).fetch("sessid", order_by="sessid", limit=1)
     max_sessid = (acquisition_shadow.SessStarted & (query_date)).fetch("sessid", order_by="sessid DESC", limit=1)
 
-    return min_sessid, max_sessid
+    return min_sessid[0], max_sessid[0]
 
 # Copy data from source tables to shadow tables
 def ingest_shadow_no_date(min_sessid, max_sessid):
