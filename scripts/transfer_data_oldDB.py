@@ -226,11 +226,13 @@ for i in range(tables_nodate_copy.shape[0]):
      schema_class= getattr(sys.modules[__name__], tables_nodate_copy.loc[i, 'TABLE_SCHEMA']+"test")
      table_class = getattr(schema_class, dj.utils.to_camel_case(tables_nodate_copy.loc[i, 'TABLE_NAME']))
      table_instance = table_class()
+     print()
 
      #Insert on groups of 1000 sessions (if not data to big)
      sess_array = np.arange(min_session,max_session+50,50)
      for j in range(sess_array.shape[0]-1):
-        sql2 = sql +' WHERE sessid >= ' + str(sess_array[j]) + " AND sessid < " + str(sess_array[j+1])
+        sql_inner = 'sessid >= ' + str(sess_array[j]) + " AND sessid < " + str(sess_array[j+1]) 
+        sql2 = sql + ' WHERE ' + sql_inner + " ORDER by sessid"
         print(sql2)
 
         con = dj.conn(host=db_params['host'],user=db_params['user'],password=db_params['password'], reset=True)
@@ -250,6 +252,16 @@ for i in range(tables_nodate_copy.shape[0]):
     
             print(data_insert)
             dj.blob.bypass_serialization = True
-            table_instance.insert(data_insert, skip_duplicates=True, allow_direct_insert=True)
-            conn1.close()
+
+            print(sql_inner)
+            data_already_table = (table_instance & sql_inner).fetch('sessid', order_by='sessid')
+            new_new_data = np.setdiff1d(data_insert['sessid'], data_already_table, assume_unique=True)
+
+            print(new_new_data)
+            print(new_new_data.size)
+
+            if new_new_data.size > 0:
+                data_insert = data_insert.loc[data_insert['sessid'].isin(list(new_new_data)), :]            
+                table_instance.insert(data_insert, skip_duplicates=True, allow_direct_insert=True)
+                conn1.close()
     
