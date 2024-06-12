@@ -3,6 +3,7 @@ import datajoint as dj
 
 bdata   = dj.create_virtual_module('bdata', 'bdatatest')
 
+'''
 # create new schema
 schema = dj.schema('bl_shadow_behavior')
 
@@ -19,3 +20,4 @@ class BehaviorEvent(dj.Computed):
      in_time:                           DOUBLE         # start time of event
      out_time:                          DOUBLE         # end time of event
      """
+'''

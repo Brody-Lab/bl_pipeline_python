@@ -1,7 +1,7 @@
 import datajoint as dj
 from bl_pipeline.datajoint01_pipeline  import acquisition
 
-
+'''
 # create new schema
 schema = dj.schema('bl_new_behavior')
 
@@ -19,3 +19,4 @@ class BehaviorEvent(dj.Manual):
      in_time:                           DOUBLE         # start time of event
      out_time:                          DOUBLE         # end time of event
      """
+'''
