@@ -245,8 +245,8 @@ def ingest_real_no_date(min_sessid, max_sessid):
 
 def ingest_computed():
 
-    dict(display_progress=True, suppress_errors=False)
-    acquisition.BehaviorEvent.populate('sessid>890000')
+    kwargs = dict(display_progress=True, suppress_errors=False)
+    acquisition.BehaviorEvent.populate('sessid>890000', **kwargs)
 
 def main():
 
