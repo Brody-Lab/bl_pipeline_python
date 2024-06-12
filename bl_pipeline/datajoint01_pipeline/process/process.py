@@ -65,6 +65,7 @@ date_ref = date_ref.strftime("%Y-%m-%d")
 # Copy data from shadow table (src_schema) to new table (target_schema)
 def copy_table(target_schema, src_schema, table_name, **kwargs):
     target_table = getattr(target_schema, table_name)
+    father_table = getattr(target_schema, table_name)
     src_table = getattr(src_schema, table_name)
 
     if table_name in list(dict_dates_big_tables.keys()):
@@ -96,6 +97,11 @@ def copy_table_no_date(target_schema, src_schema, table_name, id_ref1, id_ref2, 
         target_table = target_table & query
     
     q_insert = src_table - target_table.proj()
+
+    parent_tables = target_table.parents(as_objects=True)
+
+    for parent in parent_tables:
+        q_insert = q_insert - parent.proj()
     
     try:
         target_table.insert(q_insert, **kwargs)
@@ -250,8 +256,8 @@ def ingest_computed():
 
 def main():
 
-    ingest_shadow()
-    ingest_real()
+    #ingest_shadow()
+    #ingest_real()
 
     min_sessid, max_sessid = get_sessid_date()
     ingest_shadow_no_date(min_sessid, max_sessid)
