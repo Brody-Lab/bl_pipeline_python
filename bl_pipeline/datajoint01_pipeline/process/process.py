@@ -243,6 +243,11 @@ def ingest_real_no_date(min_sessid, max_sessid):
             for j in range(sess_array.shape[0]-1):
                 copy_table_no_date(m['module'][0], m['module'][1], table_name, sess_array[j], sess_array[j+1])
 
+def ingest_computed():
+
+    dict(display_progress=True, suppress_errors=False)
+    acquisition.BehaviorEvent.populate('sessid>890000')
+
 def main():
 
 
@@ -253,6 +258,7 @@ def main():
     min_sessid, max_sessid = get_sessid_date()
     ingest_shadow_no_date(min_sessid, max_sessid)
     ingest_real_no_date(min_sessid, max_sessid)
+    ingest_computed()
 
 
     # Copy data from shadow table to new table

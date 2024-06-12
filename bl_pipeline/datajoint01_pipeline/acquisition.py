@@ -1,10 +1,11 @@
 import datajoint as dj
+import utility.blob_transformation as bt
+import pandas as pd
 from bl_pipeline.datajoint01_pipeline  import lab, subject
 
 
 # create new schema
 schema = dj.schema('bl_new_acquisition')
-
 
 @schema
 class SessStarted(dj.Manual):
@@ -230,6 +231,23 @@ class ParsedEvents(dj.Manual):
      peh:                               mediumblob      # ratname inherited from rats table
      """
 
+     @classmethod
+     def load_behavior_event_from_parsed_events(cls,query):
+
+          parsed_events = (cls & query).fetch(as_dict=True)
+
+          num_sessions = 0
+          for parsed_event_session in parsed_events:
+               df_parsed_event = pd.DataFrame(parsed_event_session['peh'])
+               df_event = bt.peh_trial_df_to_event_df(df_parsed_event, parsed_event_session['sessid'])
+               if num_sessions == 0:
+                    df_behavior_event = df_event.copy()
+               else:
+                    df_behavior_event = pd.concat([df_behavior_event, df_event])
+               num_sessions = num_sessions + 1
+
+          return df_behavior_event
+          
 @schema
 class SessionProtocolData(dj.Manual):
      definition = """
@@ -237,3 +255,23 @@ class SessionProtocolData(dj.Manual):
      -----
      protocol_data:                     mediumblob      # protocol_data from Sessions transformed per trial events
      """
+
+@schema
+class BehaviorEvent(dj.Computed):
+     definition = """
+     ->ParsedEvents
+     id_event:                          INT(11)        # Unique number for event              
+     -----
+     trial:                             INT(10)        # trial number in session
+     event_type:                        VARCHAR(16)    # type of event in session (e.g. pokes, states)
+     event_name:                        VARCHAR(32)    # sub category of event type (e.g. C, L, R, state0)
+     entry_num:                         INT(10)        # occurence number of event inside trial
+     in_time=null:                      DOUBLE         # start time of event
+     out_time=null:                     DOUBLE         # end time of event
+     """
+     def make(self,key):
+
+          peh = (ParsedEvents & key).fetch('peh', as_dict=True)
+          df_event = bt.peh_trial_df_to_event_df(pd.DataFrame(peh[0]['peh']), key['sessid'])
+          dict_event = df_event.to_dict(orient='records')
+          self.insert(dict_event)
