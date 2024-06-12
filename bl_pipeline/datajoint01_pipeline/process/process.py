@@ -247,8 +247,8 @@ def main():
 
 
 
-    #ingest_shadow()
-    #ingest_real()
+    ingest_shadow()
+    ingest_real()
 
     min_sessid, max_sessid = get_sessid_date()
     ingest_shadow_no_date(min_sessid, max_sessid)
