@@ -250,8 +250,6 @@ def ingest_computed():
 
 def main():
 
-
-
     ingest_shadow()
     ingest_real()
 
