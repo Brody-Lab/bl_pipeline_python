@@ -65,9 +65,9 @@ date_ref = date_ref - datetime. timedelta(num_days_before)
 date_ref = date_ref.strftime("%Y-%m-%d")
 
 # Special parameters, date columns and big tables with no date field
-nodate_tables = ['sess_list', 'parsed_events', 'sessions', 'channels', '_behavior_event']
+nodate_tables = ['sess_list', 'parsed_events', 'sessions', 'channels']
 
-noneed_copy = ['schedule', 'carlosexperiment', 'infusions', 'events', 'raw_tracking', 'tracking', 'gcs_old', 'sched_rescue', 'gcs', 'video_log', 'spktimes', 'rigtrials', '~log']
+noneed_copy = ['schedule', 'carlosexperiment', 'infusions', 'events', 'raw_tracking', 'tracking', 'gcs_old', 'sched_rescue', 'gcs', 'video_log', 'spktimes', 'rigtrials', '_behavior_event', '~log']
 
 dict_dates_big_tables = {
     'technotes': 'datestr',
