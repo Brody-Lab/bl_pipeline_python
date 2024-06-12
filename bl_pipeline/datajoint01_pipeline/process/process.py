@@ -74,6 +74,10 @@ def copy_table(target_schema, src_schema, table_name, **kwargs):
         target_table = target_table & query
     
     q_insert = src_table - target_table.proj()
+
+    parent_tables = target_table.parents(as_objects=True)
+    for parent in parent_tables:
+        q_insert = q_insert - parent.proj()
     
     try:
         target_table.insert(q_insert, **kwargs)
@@ -99,9 +103,11 @@ def copy_table_no_date(target_schema, src_schema, table_name, id_ref1, id_ref2, 
     q_insert = src_table - target_table.proj()
 
     parent_tables = target_table.parents(as_objects=True)
-
+    print('parent tables xxxxx')
     for parent in parent_tables:
+        print('q_insert', q_insert)
         q_insert = q_insert - parent.proj()
+        print('q_insert', q_insert)
     
     try:
         target_table.insert(q_insert, **kwargs)
