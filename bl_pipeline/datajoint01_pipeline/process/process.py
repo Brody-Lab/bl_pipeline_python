@@ -111,9 +111,9 @@ def copy_table_no_date(target_schema, src_schema, table_name, id_ref1, id_ref2, 
     try:
         target_table.insert(q_insert, **kwargs)
     except Exception:
-        for t in (q_insert).fetch(as_dict=True):
             try:
-                target_table.insert1(t, **kwargs)
+                for t in (q_insert).fetch(as_dict=True):
+                    target_table.insert1(t, **kwargs)
             except Exception:
                 print("Error when inserting {}".format(t))
                 #traceback.print_exc()
@@ -265,6 +265,7 @@ def main():
     ingest_real()
 
     min_sessid, max_sessid = get_sessid_date()
+    dj.blob.use_32bit_dims = False
     ingest_shadow_no_date(min_sessid, max_sessid)
     ingest_real_no_date(min_sessid, max_sessid)
     ingest_computed()
