@@ -64,18 +64,22 @@ class Mass(dj.Computed):
 
           if data['date'] != '0000-00-00':
                try:
-                    data_email = (ratinfo.Contacts & {'initials': data['tech']}).fetch1('email')
-                    weighing_datetime = datetime.datetime.combine(data['date'],(datetime.datetime.min + data['timeval']).time())
+                    data_email = (ratinfo.Contacts & {'initials': data['tech']}).fetch('email')
+                    if len(data_email) == 1:
+                         data_email = data_email[0]
+                         data_email = data_email.split('@')[0]
 
-                    entry = dict(
-                         mass_id                  = data['weighing'],
-                         ratname                  = data['ratname'],
-                         weigh_person             = data_email.split('@')[0],
-                         weighing_datetime        = weighing_datetime,
-                         mass                     = data['mass']
-                    )
+                         weighing_datetime = datetime.datetime.combine(data['date'],(datetime.datetime.min + data['timeval']).time())
 
-                    self.insert1(entry)
+                         entry = dict(
+                              mass_id                  = data['weighing'],
+                              ratname                  = data['ratname'],
+                              weigh_person             = data_email,
+                              weighing_datetime        = weighing_datetime,
+                              mass                     = data['mass']
+                         )
+
+                         self.insert1(entry)
                except Exception as e: 
                     print(e)
 
