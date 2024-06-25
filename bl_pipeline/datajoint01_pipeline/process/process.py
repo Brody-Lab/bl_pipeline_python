@@ -261,8 +261,8 @@ def ingest_computed():
 
 def main():
 
-    ingest_shadow()
-    ingest_real()
+    #ingest_shadow()
+    #ingest_real()
 
     min_sessid, max_sessid = get_sessid_date()
     dj.blob.use_32bit_dims = False
