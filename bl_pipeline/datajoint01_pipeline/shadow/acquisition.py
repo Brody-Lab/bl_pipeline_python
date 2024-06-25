@@ -160,6 +160,9 @@ class SessionProtocolData(dj.Computed):
      """
      def make(self,key):
           dj.blob.use_32bit_dims = True
-          protocol_data = (bdata.Sessions & key).fetch('protocol_data', as_dict=True)
-          key['protocol_data'] = bt.transform_blob(protocol_data[0]['protocol_data'])
-          self.insert1(key)
+          try:
+               protocol_data = (bdata.Sessions & key).fetch('protocol_data', as_dict=True)
+               key['protocol_data'] = bt.transform_blob(protocol_data[0]['protocol_data'])
+               self.insert1(key)
+          except Exception:
+                print("Error when inserting {}".format(key))
