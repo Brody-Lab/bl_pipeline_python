@@ -192,7 +192,7 @@ MODULES_NO_DATE = [
 # Copy data from source tables to shadow tables
 def ingest_shadow():
 
-    kwargs = dict(display_progress=True, suppress_errors=False)
+    kwargs = dict(display_progress=True, suppress_errors=True)
     for m in MODULES:
         for table_name in m['tables']:
             table_shadow = getattr(m['module'][1], table_name)
