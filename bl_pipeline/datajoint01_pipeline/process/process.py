@@ -230,7 +230,7 @@ def get_sessid_date():
 # Copy data from source tables to shadow tables
 def ingest_shadow_no_date(min_sessid, max_sessid):
 
-    kwargs = dict(display_progress=True, suppress_errors=False)
+    kwargs = dict(display_progress=True, suppress_errors=True)
     for m in MODULES_NO_DATE:
         for table_name in m['tables']:
             table_shadow = getattr(m['module'][1], table_name)
@@ -256,7 +256,7 @@ def ingest_real_no_date(min_sessid, max_sessid):
 
 def ingest_computed():
 
-    kwargs = dict(display_progress=True, suppress_errors=False)
+    kwargs = dict(display_progress=True, suppress_errors=True)
     acquisition.BehaviorEvent.populate('sessid>890000', **kwargs)
 
 def main():
