@@ -12,6 +12,7 @@ def get_all_session_aggregate(subjects = None):
     ratinfo = dj.create_virtual_module('ratinfo', 'ratinfo')
 
     df_agg_data = get_previous_agg_data(subjects=subjects,bdata=bdata)
+
     df_sessions = aggregate_todays_sessions(subjects=subjects, bdata=bdata)
     df_mass = aggregate_todays_mass(subjects=subjects, ratinfo=ratinfo)
     df_water = aggregate_todays_water(subjects=subjects, ratinfo=ratinfo)
@@ -21,13 +22,17 @@ def get_all_session_aggregate(subjects = None):
     df_sessions = df_sessions.drop(columns='date')
     df_sessions = pd.merge(df_sessions, df_water, how='left', left_on='ratname', right_on='rat')
     df_sessions = df_sessions.drop(columns='date')
-    df_sessions['num_water'] = df_sessions['num_water'].fillna(0)
+    if df_water.shape[0] > 0:
+        df_sessions['num_water'] = df_sessions['num_water'].fillna(0)
     df_sessions = pd.merge(df_sessions, df_rigwater, how='left', on='ratname')
     df_sessions = df_sessions.drop(columns='dateval')
     df_sessions = df_sessions.drop(columns='rat')
-    df_sessions['num_rigwater'] = df_sessions['num_rigwater'].fillna(0)
+    if df_rigwater.shape[0] > 0:
+        df_sessions['num_rigwater'] = df_sessions['num_rigwater'].fillna(0)
 
     df_sessions = pd.concat([df_agg_data, df_sessions], axis=0, ignore_index=True)
+
+    df_sessions = convert_df_session_aggtypes(df_sessions, bdata.SessionAggDate)
 
     return df_sessions
 
@@ -44,7 +49,7 @@ def get_previous_agg_data(subjects=None, bdata=None):
         session_query = "sessiondate > '" + query_date + "'"
 
     columns_query = ['ratname', 'sessiondate', 'num_sessions', 'n_done_trials', 'hostname', 'starttime', 'endtime',
-                    'total_correct', 'percent_violations', 'right_correct', 'left_correct',
+                    'total_correct', 'percent_violations', 'right_correct', 'left_correct', 'foodpuck',
                     'mass', 'tech', 
                     'percent_target', 'volume', 'num_water', 
                     'totalvol', 'num_rigwater']
@@ -74,7 +79,7 @@ def aggregate_todays_sessions(subjects = None, bdata=None):
         todays_session_query = [{'ratname': x, 'sessiondate': todays_date} for x in subjects] 
 
     columns_query = ['ratname', 'sessiondate', 'n_done_trials',
-                    'starttime', 'endtime', 'hostname', 'total_correct', 'percent_violations', 'right_correct', 'left_correct']
+                    'starttime', 'endtime', 'hostname', 'total_correct', 'percent_violations', 'right_correct', 'left_correct', 'foodpuck']
 
     todays_sessions = pd.DataFrame((bdata.Sessions & todays_session_query).fetch(*columns_query, as_dict=True))
     if todays_sessions.shape[0] > 0:
@@ -97,6 +102,7 @@ def aggregate_todays_sessions(subjects = None, bdata=None):
             'percent_violations_n': [('percent_violations', 'sum')],
             'right_correct_n': [('right_correct', 'sum')],
             'left_correct_n': [('left_correct', 'sum')],
+            'foodpuck': [('foodpuck', 'mean')],
         })
 
         todays_sessions_agg1.columns = todays_sessions_agg1.columns.droplevel()
@@ -195,3 +201,33 @@ def aggregate_todays_rigwater(subjects = None, ratinfo=None):
         todays_rigwater_agg1 = pd.DataFrame(columns=columns_query)
     
     return todays_rigwater_agg1
+
+def convert_time_column(df, column_convert):
+
+    df[column_convert] = pd.to_datetime(df[column_convert]).dt.time
+    return df
+
+
+def convert_date_column(df, column_convert):
+
+    df[column_convert] = pd.to_datetime(df[column_convert]).dt.date
+    return df
+
+
+def convert_df_session_aggtypes(df, table_convert):
+
+    fields_table = pd.DataFrame.from_dict(table_convert.heading.attributes, orient='index')
+
+    dict_converter = {'int': 'Int64', 'decimal': 'float', 'float': 'float', 'varchar': str}
+    dict_keys = list(dict_converter.keys())
+
+    for column in df.columns:
+
+        column_type = fields_table.loc[column, 'type']
+        match_type = [x for x in dict_keys if x in column_type]
+        if len(match_type) > 0:
+            type_apply = dict_converter[match_type[0]]
+            df[column] = df[column].astype(type_apply)
+
+    return df
+        
