@@ -104,7 +104,7 @@ def copy_table_no_date(target_schema, src_schema, table_name, id_ref1, id_ref2, 
     #parent_tables = target_table.parents(as_objects=True)
     #print('parent tables xxxxx')
     #for parent in parent_tables:
-    #    print('q_insert', q_insert)
+    print('q_insert', q_insert)
     #    q_insert = q_insert - parent.proj()
     #    print('q_insert', q_insert)
     
