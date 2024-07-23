@@ -111,11 +111,11 @@ def copy_table_no_date(target_schema, src_schema, table_name, id_ref1, id_ref2, 
     try:
         target_table.insert(q_insert, **kwargs)
     except Exception:
-            try:
-                for t in (q_insert).fetch(as_dict=True):
+            for t in (q_insert).fetch(as_dict=True):
+                try:
                     target_table.insert1(t, **kwargs)
-            except Exception:
-                print("Error when inserting {}".format(t))
+                except Exception:
+                    print("Error when inserting {}".format(t))
                 #traceback.print_exc()
     
 
