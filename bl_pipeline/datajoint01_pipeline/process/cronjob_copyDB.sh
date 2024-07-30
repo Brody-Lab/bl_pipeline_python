@@ -8,7 +8,7 @@ source /home/u19prod@pu.win.princeton.edu/.bash_profile
 cd "/home/u19prod@pu.win.princeton.edu/Datajoint_projs/bl_pipeline_python/"
 git pull
 
-num_days=3000
+num_days=45
 
 conda activate bl_pipeline_python_env_py39
 #python scripts/transfer_data_oldDB.py $num_days

@@ -268,7 +268,7 @@ def main():
     dj.blob.use_32bit_dims = False
     ingest_shadow_no_date(min_sessid, max_sessid)
     ingest_real_no_date(min_sessid, max_sessid)
-    ingest_computed()
+    #ingest_computed()
 
 
     # Copy data from shadow table to new table
