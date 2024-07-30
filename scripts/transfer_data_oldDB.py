@@ -67,7 +67,7 @@ date_ref = date_ref.strftime("%Y-%m-%d")
 # Special parameters, date columns and big tables with no date field
 nodate_tables = ['sess_list', 'parsed_events', 'sessions', 'channels']
 
-noneed_copy = ['schedule', 'carlosexperiment', 'infusions', 'events', 'raw_tracking', 'tracking', 'gcs_old', 'sched_rescue', 'gcs', 'video_log', 'spktimes', 'rigtrials', '_behavior_event', '~log']
+noneed_copy = ['schedule', 'carlosexperiment', 'infusions', 'events', 'raw_tracking', 'tracking', 'gcs_old', 'sched_rescue', 'gcs', 'video_log', 'spktimes', 'rigtrials', '_behavior_event', '~log', 'session_agg_date']
 
 dict_dates_big_tables = {
     'technotes': 'datestr',
